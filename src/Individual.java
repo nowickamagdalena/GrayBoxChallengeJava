@@ -26,7 +26,7 @@ public class Individual {
         }
     }
 
-
+    // crossover between parent creating two new Individuals based on parent genotype
     public static ArrayList<Individual> crossover(Individual parent1, Individual parent2) {
         Individual child1 = new Individual(parent1.getGenotypeLength(), parent1.getProblemInstance());
         Individual child2 = new Individual(parent1.getGenotypeLength(), parent1.getProblemInstance());
@@ -48,6 +48,7 @@ public class Individual {
         return children;
     }
 
+    // mutating genotype if it improves the solution
     public void mutation(double mutationThreshold) {
         for (int i = 0; i < this.genotypeLength; i++) {
             if (randomProbability() <= mutationThreshold) {
@@ -68,10 +69,12 @@ public class Individual {
         return generator.nextInt(Integer.MAX_VALUE);
     }
 
+    //computing fittness for the individual's genotype
     public double fitness() {
         return (double)this.problemInstance.compute(this.genotype) / this.problemInstance.getClausesNumber();
     }
 
+    //randomizing genotype of the individual
     public void randomizeGenotype() {
         for (int i = 0; i < this.genotypeLength; i++) {
             if(randomPosInt() % 2 == 0)
@@ -80,7 +83,7 @@ public class Individual {
                 this.genotype[i] = false;
         }
     }
-
+    //returning genotype as string of '1' and '0' for every variable value
     public String getResultAsString() {
         int size = this.problemInstance.getVarsNumber();
         String result = "";

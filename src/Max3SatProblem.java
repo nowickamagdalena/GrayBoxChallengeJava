@@ -3,8 +3,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
 
 public class Max3SatProblem {
@@ -21,15 +19,7 @@ public class Max3SatProblem {
         this.clauses = new ArrayList<>();
     }
 
-    private boolean isInteger(String str) {
-        try{
-            Integer.parseInt(str);
-            return true;
-        }catch (NumberFormatException e){
-            return false;
-        }
-    }
-
+    //loading txt file with defined clauses
     public boolean load(String fileName){
         BufferedReader br = null;
         FileReader fr = null;
@@ -38,29 +28,37 @@ public class Max3SatProblem {
             fr = new FileReader(fileName);
             br = new BufferedReader(fr);
             String line;
+            //reading file line by line to get one clause at a time
             while((line = br.readLine()) != null){
+                //creating new clause as two dimensional array
                 int[][] nextClause = new int[this.clauseLength][2];
                 int i = 0;
-                String[] vars = line.split(" ");
-                for(String s : vars){
+                String[] words = line.split(" ");
+                for(String s : words){
+                    //checking if the word is variable, not bracket
                     if(isInteger(s)){
                         int currentVar = Math.abs(Integer.parseInt(s));
+                        //adding variable to clause
                         nextClause[i][0] = currentVar;
-
+                        //adding variable sign to clause
                         if(s.charAt(0) == '-')
                             nextClause[i][1] = -1;
                         else
                             nextClause[i][1] = 0;
+                        //adding variable to the set
                         varSet.add(currentVar);
                         i++;
                     }
                 }
                 this.clauses.add(nextClause);
             }
+            // creating arrayList from set, as set is complete
             this.variables = new ArrayList<>(varSet);
+            //segregating loaded clauses to variables, to optimize searching
+            segregateClausesToVariables();
+
 //            printClauses();
 //            printVariables();
-            segregateClausesToVariables();
 //            printSegregatedClauses();
             return true;
 
@@ -68,8 +66,7 @@ public class Max3SatProblem {
             System.out.println("File not found");
 
         } catch (IOException e){
-            System.out.println("Other exception");
-
+            e.printStackTrace();
         } finally {
             try {
                 if(fr != null)
@@ -83,8 +80,19 @@ public class Max3SatProblem {
         return false;
     }
 
+    private boolean isInteger(String str) {
+        try{
+            Integer.parseInt(str);
+            return true;
+        }catch (NumberFormatException e){
+            return false;
+        }
+    }
+
     private void segregateClausesToVariables() {
+        //creating array for all variables to store clauses, which include the variable
         this.clausesByVars = new ArrayList[this.variables.size()];
+
         for( int i = 0; i < this.clausesByVars.length; i++){
             this.clausesByVars[i] = new ArrayList<>();
         }
@@ -102,10 +110,12 @@ public class Max3SatProblem {
         return this.variables.size();
     }
 
+    // computing number of satisfied clauses for given solution
     public int compute(boolean[] solution) {
         int satCount = 0;
         for (int i = 0; i < this.clauses.size(); i++) {
             boolean isSatisfied = false;
+
             for (int j = 0; j < this.clauseLength && !isSatisfied; j++) {
                 int variable = this.clauses.get(i)[j][0];
                 int varIndx = this.variables.indexOf(variable);
@@ -126,7 +136,7 @@ public class Max3SatProblem {
         }
         return satCount;
     }
-
+    // computing number of satisfied clauses containing given variable
     public int computeClausesContainingVariable(boolean[] solution, int variablePosition) {
         int satCount = 0;
         for (int i = 0; i < this.clausesByVars[variablePosition].size(); i++) {
@@ -172,7 +182,7 @@ public class Max3SatProblem {
     public void printSegregatedClauses() {
         for (int i = 0; i < this.variables.size(); i++) {
             for (int j = 0; j < this.clausesByVars[i].size(); j++) {
-                System.out.println(this.clausesByVars[i].get(j) + ", ");
+                System.out.print(this.clausesByVars[i].get(j) + ", ");
             }
             System.out.println();
         }

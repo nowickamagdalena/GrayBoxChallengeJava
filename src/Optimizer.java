@@ -33,7 +33,7 @@ public class Optimizer {
             this.solutionsPopulation.add(indiv);
         }
     }
-
+    //run one iteration for creating new population of solutions
     public void runIteration(){
         ArrayList<Individual> newSolPopulation = new ArrayList<>();
 
@@ -42,6 +42,7 @@ public class Optimizer {
             Individual parent2 = chooseParent();
             Individual child1;
             Individual child2;
+
             if (randomProbability() <= this.crossoverThreshold) {
                 ArrayList<Individual> children = Individual.crossover(parent1, parent2);
                 child1 = children.get(0);
@@ -59,14 +60,15 @@ public class Optimizer {
         }
 
         this.solutionsPopulation = newSolPopulation;
+        //finding new best solution for the population after iteration
         findBestResult();
     }
 
-
+    // finding parent for crossover
     public Individual chooseParent() {
         int parent1Index = randomPosInt() % this.populationSize;
         int parent2Index = randomPosInt() % this.populationSize;
-
+        //choosing better parent
         if (this.solutionsPopulation.get(parent1Index).fitness() < this.solutionsPopulation.get(parent2Index).fitness())
             return this.solutionsPopulation.get(parent2Index);
         else
@@ -81,6 +83,7 @@ public class Optimizer {
         return generator.nextInt(Integer.MAX_VALUE);
     }
 
+    //setting new best solution by comparing population individuals fittness
     public void findBestResult() {
         for (int i = 0; i < this.solutionsPopulation.size(); i++) {
             if (this.solutionsPopulation.get(i).fitness() > this.currentBestFitness) {
